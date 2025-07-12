@@ -2,9 +2,8 @@ import proxiesData from "@/services/mockData/proxies.json";
 
 class ProxyService {
   constructor() {
-    this.proxies = [...proxiesData];
+    this.proxies = [];
   }
-
   async delay(ms = 300) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }

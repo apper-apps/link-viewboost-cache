@@ -2,9 +2,8 @@ import campaignsData from "@/services/mockData/campaigns.json";
 
 class CampaignService {
   constructor() {
-    this.campaigns = [...campaignsData];
+    this.campaigns = [];
   }
-
   async delay(ms = 300) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
