@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'react-toastify/dist/ReactToastify.css';
+
+/* Toast overrides for dark theme */
+.Toastify__toast {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+  border: 1px solid #404040 !important;
+  border-radius: 8px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 14px !important;
+  min-height: 64px !important;
+  padding: 12px 16px !important;
+}
+
+.Toastify__toast--success {
+  border-color: #00FF88 !important;
+}
+
+.Toastify__toast--error {
+  border-color: #FF3366 !important;
+}
+
+.Toastify__toast--warning {
+  border-color: #FFB800 !important;
+}
+
+.Toastify__toast--info {
+  border-color: #00B4FF !important;
+}
+
+.Toastify__progress-bar {
+  background: linear-gradient(90deg, #FF0000, #00F0FF) !important;
+}
+
+.Toastify__close-button {
+  color: #ffffff !important;
+  opacity: 0.7 !important;
+}
+
+.Toastify__close-button:hover {
+  opacity: 1 !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #0f0f0f;
+  color: #ffffff;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #404040;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555555;
+}
+
+/* Progress ring animation */
+@keyframes progress-ring {
+  0% {
+    stroke-dasharray: 0 100;
+  }
+}
+
+.progress-ring {
+  animation: progress-ring 1s ease-out;
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "Id": 1,
+    "address": "192.168.1.100",
+    "port": 8080,
+    "username": "user1",
+    "password": "pass123",
+    "status": "online",
+    "lastChecked": "2024-01-20T12:00:00Z",
+    "responseTime": 125,
+    "successRate": 98.5
+  },
+  {
+    "Id": 2,
+    "address": "10.0.0.50",
+    "port": 3128,
+    "username": "proxyuser",
+    "password": "secure456",
+    "status": "online",
+    "lastChecked": "2024-01-20T12:00:00Z",
+    "responseTime": 89,
+    "successRate": 99.2
+  },
+  {
+    "Id": 3,
+    "address": "172.16.0.25",
+    "port": 8888,
+    "username": "admin",
+    "password": "proxy789",
+    "status": "offline",
+    "lastChecked": "2024-01-20T11:45:00Z",
+    "responseTime": 0,
+    "successRate": 85.3
+  },
+  {
+    "Id": 4,
+    "address": "203.0.113.42",
+    "port": 9050,
+    "username": "viewer",
+    "password": "watch321",
+    "status": "online",
+    "lastChecked": "2024-01-20T12:00:00Z",
+    "responseTime": 156,
+    "successRate": 97.8
+  },
+  {
+    "Id": 5,
+    "address": "198.51.100.15",
+    "port": 8080,
+    "username": "boost",
+    "password": "views654",
+    "status": "checking",
+    "lastChecked": "2024-01-20T11:58:00Z",
+    "responseTime": 210,
+    "successRate": 94.1
+  }
+]

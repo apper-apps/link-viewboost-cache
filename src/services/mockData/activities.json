@@ -1,0 +1,89 @@
+[
+  {
+    "Id": 1,
+    "campaignId": "1",
+    "type": "views_milestone",
+    "message": "Campaign reached 30,000 views milestone",
+    "severity": "success",
+    "timestamp": "2024-01-20T11:30:00Z",
+    "metadata": {
+      "views": 30000,
+      "target": 50000,
+      "progress": "60%"
+    }
+  },
+  {
+    "Id": 2,
+    "campaignId": "2",
+    "type": "subscribers_milestone",
+    "message": "Campaign gained 400 subscribers",
+    "severity": "success",
+    "timestamp": "2024-01-20T10:45:00Z",
+    "metadata": {
+      "subscribers": 400,
+      "target": 500,
+      "progress": "80%"
+    }
+  },
+  {
+    "Id": 3,
+    "campaignId": "3",
+    "type": "campaign_paused",
+    "message": "Campaign paused by user",
+    "severity": "warning",
+    "timestamp": "2024-01-20T09:15:00Z",
+    "metadata": {
+      "reason": "manual_pause"
+    }
+  },
+  {
+    "Id": 4,
+    "campaignId": "",
+    "type": "proxy_failed",
+    "message": "Proxy 172.16.0.25:8888 went offline",
+    "severity": "error",
+    "timestamp": "2024-01-20T08:30:00Z",
+    "metadata": {
+      "proxy": "172.16.0.25:8888",
+      "lastResponse": "timeout"
+    }
+  },
+  {
+    "Id": 5,
+    "campaignId": "5",
+    "type": "campaign_created",
+    "message": "New campaign created: Cryptocurrency Investment Guide",
+    "severity": "info",
+    "timestamp": "2024-01-18T10:15:00Z",
+    "metadata": {
+      "targetViews": 80000,
+      "targetSubscribers": 1200
+    }
+  },
+  {
+    "Id": 6,
+    "campaignId": "1",
+    "type": "views_milestone",
+    "message": "Campaign reached 25,000 views milestone",
+    "severity": "success",
+    "timestamp": "2024-01-19T16:20:00Z",
+    "metadata": {
+      "views": 25000,
+      "target": 50000,
+      "progress": "50%"
+    }
+  },
+  {
+    "Id": 7,
+    "campaignId": "4",
+    "type": "campaign_completed",
+    "message": "Campaign completed successfully - all targets reached",
+    "severity": "success",
+    "timestamp": "2024-01-18T14:30:00Z",
+    "metadata": {
+      "finalViews": 100000,
+      "finalSubscribers": 2000,
+      "duration": "60 days"
+    }
+  }
+]
