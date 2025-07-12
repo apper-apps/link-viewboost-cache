@@ -3,14 +3,43 @@ import proxiesData from "@/services/mockData/proxies.json";
 class ProxyService {
   constructor() {
     this.proxies = [];
+    this._cache = new Map();
+    this._cacheTimeout = 30000; // 30 seconds
   }
-  async delay(ms = 300) {
+
+  async delay(ms = 200) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  async getAll() {
-    await this.delay();
-    return [...this.proxies];
+  _getCacheKey(method, params = '') {
+    return `${method}_${params}`;
+  }
+
+  _setCache(key, data) {
+    this._cache.set(key, {
+      data,
+      timestamp: Date.now()
+    });
+  }
+
+  _getCache(key) {
+    const cached = this._cache.get(key);
+    if (cached && (Date.now() - cached.timestamp) < this._cacheTimeout) {
+      return cached.data;
+    }
+    this._cache.delete(key);
+    return null;
+  }
+
+async getAll() {
+    const cacheKey = this._getCacheKey('getAll');
+    const cached = this._getCache(cacheKey);
+    if (cached) return cached;
+
+    await this.delay(150);
+    const result = [...this.proxies];
+    this._setCache(cacheKey, result);
+    return result;
   }
 
   async getById(id) {
@@ -22,8 +51,8 @@ class ProxyService {
     return { ...proxy };
   }
 
-  async create(proxyData) {
-    await this.delay(400);
+async create(proxyData) {
+    await this.delay(300);
     
     const newProxy = {
       Id: Math.max(...this.proxies.map(p => p.Id), 0) + 1,
@@ -34,7 +63,8 @@ class ProxyService {
       successRate: 0
     };
 
-    this.proxies.push(newProxy);
+    this.proxies.unshift(newProxy); // Add to beginning for better UX
+    this._cache.clear(); // Clear cache after mutation
     
     // Simulate status check after creation
     setTimeout(() => {
@@ -43,13 +73,13 @@ class ProxyService {
         responseTime: Math.floor(Math.random() * 200) + 50,
         successRate: Math.random() * 20 + 80
       });
-    }, 2000);
+    }, 1500);
 
     return { ...newProxy };
   }
 
-  async update(id, updates) {
-    await this.delay();
+async update(id, updates) {
+    await this.delay(100);
     
     const index = this.proxies.findIndex(p => p.Id === parseInt(id));
     if (index === -1) {
@@ -61,11 +91,12 @@ class ProxyService {
       ...updates,
       lastChecked: new Date().toISOString()
     };
+    this._cache.clear(); // Clear cache after mutation
     return { ...this.proxies[index] };
   }
 
-  async delete(id) {
-    await this.delay();
+async delete(id) {
+    await this.delay(100);
     
     const index = this.proxies.findIndex(p => p.Id === parseInt(id));
     if (index === -1) {
@@ -73,34 +104,46 @@ class ProxyService {
     }
 
     this.proxies.splice(index, 1);
+    this._cache.clear(); // Clear cache after mutation
     return true;
   }
 
-  async bulkImport(proxyList) {
-    await this.delay(800);
+async bulkImport(proxyList) {
+    await this.delay(500);
     
     const newProxies = [];
     let currentMaxId = Math.max(...this.proxies.map(p => p.Id), 0);
+    const batchSize = 50; // Process in batches for better performance
 
-    for (const proxyString of proxyList) {
-      try {
-        const proxy = this.parseProxyString(proxyString);
-        const newProxy = {
-          Id: ++currentMaxId,
-          ...proxy,
-          status: "checking",
-          lastChecked: new Date().toISOString(),
-          responseTime: 0,
-          successRate: 0
-        };
-        
-        this.proxies.push(newProxy);
-        newProxies.push(newProxy);
-      } catch (error) {
-        console.warn(`Failed to parse proxy: ${proxyString}`);
+    for (let i = 0; i < proxyList.length; i += batchSize) {
+      const batch = proxyList.slice(i, i + batchSize);
+      
+      for (const proxyString of batch) {
+        try {
+          const proxy = this.parseProxyString(proxyString);
+          const newProxy = {
+            Id: ++currentMaxId,
+            ...proxy,
+            status: "checking",
+            lastChecked: new Date().toISOString(),
+            responseTime: 0,
+            successRate: 0
+          };
+          
+          this.proxies.unshift(newProxy); // Add to beginning
+          newProxies.push(newProxy);
+        } catch (error) {
+          console.warn(`Failed to parse proxy: ${proxyString}`);
+        }
+      }
+      
+      // Small delay between batches to prevent blocking
+      if (i + batchSize < proxyList.length) {
+        await this.delay(50);
       }
     }
 
+    this._cache.clear(); // Clear cache after bulk operation
     return newProxies;
   }
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import CampaignCard from "@/components/organisms/CampaignCard";
@@ -34,17 +34,19 @@ const Campaigns = () => {
 
   const { proxies } = useProxies();
 
-  // Filter campaigns
-  const filteredCampaigns = React.useMemo(() => {
+// Debounced search and optimized filtering
+  const filteredCampaigns = useMemo(() => {
     return campaigns.filter(campaign => {
-      const matchesSearch = campaign.videoTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          campaign.videoUrl.toLowerCase().includes(searchTerm.toLowerCase());
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch = !searchTerm || 
+        campaign.videoTitle.toLowerCase().includes(searchLower) ||
+        campaign.videoUrl.toLowerCase().includes(searchLower);
       const matchesStatus = statusFilter === "all" || campaign.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
   }, [campaigns, searchTerm, statusFilter]);
 
-  const statusCounts = React.useMemo(() => {
+  const statusCounts = useMemo(() => {
     const counts = { all: campaigns.length };
     campaigns.forEach(campaign => {
       counts[campaign.status] = (counts[campaign.status] || 0) + 1;
@@ -52,7 +54,7 @@ const Campaigns = () => {
     return counts;
   }, [campaigns]);
 
-  const handleCreateCampaign = async (campaignData) => {
+const handleCreateCampaign = useCallback(async (campaignData) => {
     try {
       await createCampaign(campaignData);
       toast.success("Campaign created successfully!");
@@ -60,36 +62,36 @@ const Campaigns = () => {
       toast.error(error.message);
       throw error;
     }
-  };
+  }, [createCampaign]);
 
-  const handleStartCampaign = async (id) => {
+  const handleStartCampaign = useCallback(async (id) => {
     try {
       await startCampaign(id);
       toast.success("Campaign started successfully!");
     } catch (error) {
       toast.error(error.message);
     }
-  };
+  }, [startCampaign]);
 
-  const handlePauseCampaign = async (id) => {
+  const handlePauseCampaign = useCallback(async (id) => {
     try {
       await pauseCampaign(id);
       toast.warning("Campaign paused");
     } catch (error) {
       toast.error(error.message);
     }
-  };
+  }, [pauseCampaign]);
 
-  const handleStopCampaign = async (id) => {
+  const handleStopCampaign = useCallback(async (id) => {
     try {
       await stopCampaign(id);
       toast.info("Campaign stopped");
     } catch (error) {
       toast.error(error.message);
     }
-  };
+  }, [stopCampaign]);
 
-  const handleDeleteCampaign = async (id) => {
+  const handleDeleteCampaign = useCallback(async (id) => {
     if (window.confirm("Are you sure you want to delete this campaign?")) {
       try {
         await deleteCampaign(id);
@@ -98,11 +100,11 @@ const Campaigns = () => {
         toast.error(error.message);
       }
     }
-  };
+  }, [deleteCampaign]);
 
-  const handleViewCampaign = (id) => {
+  const handleViewCampaign = useCallback((id) => {
     navigate(`/campaigns/${id}`);
-  };
+  }, [navigate]);
 
   if (loading) {
     return <Loading type="cards" />;
@@ -126,41 +128,41 @@ const Campaigns = () => {
     { value: "stopped", label: "Stopped", count: statusCounts.stopped || 0 }
   ];
 
-  return (
-    <div className="space-y-8">
+return (
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold font-display text-white">Campaigns</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold font-display text-white">Campaigns</h1>
           <p className="text-gray-400 mt-1">Manage your YouTube growth campaigns</p>
         </div>
-        <Button onClick={() => setShowCreateModal(true)}>
+        <Button onClick={() => setShowCreateModal(true)} className="min-h-[44px]">
           <ApperIcon name="Plus" className="w-5 h-5 mr-2" />
           New Campaign
         </Button>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col lg:flex-row gap-4">
+      <div className="flex flex-col xl:flex-row gap-4">
         <SearchBar
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search campaigns..."
-          className="lg:max-w-md"
+          className="w-full xl:max-w-md"
         />
         
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 overflow-x-auto pb-2">
           {statusOptions.map((option) => (
             <button
               key={option.value}
               onClick={() => setStatusFilter(option.value)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 whitespace-nowrap min-h-[44px] ${
                 statusFilter === option.value
                   ? "bg-primary text-white"
                   : "bg-surface text-gray-300 hover:bg-gray-700"
               }`}
             >
-              <span>{option.label}</span>
+              <span className="text-sm sm:text-base">{option.label}</span>
               <Badge variant={statusFilter === option.value ? "default" : "default"}>
                 {option.count}
               </Badge>
@@ -183,17 +185,17 @@ const Campaigns = () => {
           icon="Target"
         />
       ) : (
-        <motion.div
+<motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6"
         >
           {filteredCampaigns.map((campaign, index) => (
             <motion.div
               key={campaign.Id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
+              transition={{ delay: Math.min(index * 0.03, 0.5) }}
             >
               <CampaignCard
                 campaign={campaign}

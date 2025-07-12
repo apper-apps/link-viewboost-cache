@@ -14,7 +14,7 @@ const Layout = () => {
     setSidebarOpen(false);
   };
 
-  return (
+return (
     <div className="min-h-screen bg-background">
       <div className="flex h-screen overflow-hidden">
         {/* Sidebar */}
@@ -24,11 +24,11 @@ const Layout = () => {
         />
 
         {/* Main content */}
-        <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
+        <div className="flex-1 flex flex-col overflow-hidden">
           <Header onMenuClick={handleMenuClick} />
           
-          <main className="flex-1 overflow-y-auto">
-            <div className="p-6 lg:p-8">
+          <main className="flex-1 overflow-y-auto overscroll-y-contain">
+            <div className="p-4 sm:p-6 lg:p-8 max-w-screen-2xl mx-auto">
               <Outlet />
             </div>
           </main>

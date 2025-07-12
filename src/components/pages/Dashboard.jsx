@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import StatCard from "@/components/molecules/StatCard";
 import CampaignCard from "@/components/organisms/CampaignCard";
@@ -34,8 +34,8 @@ const Dashboard = () => {
   const { proxies } = useProxies();
   const { activities } = useActivities();
 
-  // Calculate dashboard stats
-  const stats = React.useMemo(() => {
+// Calculate dashboard stats with performance optimization
+  const stats = useMemo(() => {
     const totalViews = campaigns.reduce((sum, c) => sum + c.currentViews, 0);
     const totalSubscribers = campaigns.reduce((sum, c) => sum + c.currentSubscribers, 0);
     const activeCampaigns = campaigns.filter(c => c.status === "running").length;
@@ -49,7 +49,7 @@ const Dashboard = () => {
     };
   }, [campaigns, proxies]);
 
-  const handleCreateCampaign = async (campaignData) => {
+const handleCreateCampaign = useCallback(async (campaignData) => {
     try {
       await createCampaign(campaignData);
       toast.success("Campaign created successfully!");
@@ -57,38 +57,38 @@ const Dashboard = () => {
       toast.error(error.message);
       throw error;
     }
-  };
+  }, [createCampaign]);
 
-  const handleStartCampaign = async (id) => {
+  const handleStartCampaign = useCallback(async (id) => {
     try {
       await startCampaign(id);
       toast.success("Campaign started successfully!");
     } catch (error) {
       toast.error(error.message);
     }
-  };
+  }, [startCampaign]);
 
-  const handlePauseCampaign = async (id) => {
+  const handlePauseCampaign = useCallback(async (id) => {
     try {
       await pauseCampaign(id);
       toast.warning("Campaign paused");
     } catch (error) {
       toast.error(error.message);
     }
-  };
+  }, [pauseCampaign]);
 
-  const handleStopCampaign = async (id) => {
+  const handleStopCampaign = useCallback(async (id) => {
     try {
       await stopCampaign(id);
       toast.info("Campaign stopped");
     } catch (error) {
       toast.error(error.message);
     }
-  };
+  }, [stopCampaign]);
 
-  const handleViewCampaign = (id) => {
+  const handleViewCampaign = useCallback((id) => {
     navigate(`/campaigns/${id}`);
-  };
+  }, [navigate]);
 
   if (campaignsLoading) {
     return (
@@ -110,15 +110,15 @@ const Dashboard = () => {
 
   const activeCampaigns = campaigns.filter(c => ["running", "paused"].includes(c.status));
 
-  return (
-    <div className="space-y-8">
+return (
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold font-display text-white">Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold font-display text-white">Dashboard</h1>
           <p className="text-gray-400 mt-1">Monitor your YouTube growth campaigns</p>
         </div>
-        <Button onClick={() => setShowCreateModal(true)}>
+        <Button onClick={() => setShowCreateModal(true)} className="min-h-[44px]">
           <ApperIcon name="Plus" className="w-5 h-5 mr-2" />
           New Campaign
         </Button>
@@ -126,9 +126,9 @@ const Dashboard = () => {
 
       {/* Stats Grid */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6"
       >
         <StatCard
           title="Total Views"
@@ -160,16 +160,17 @@ const Dashboard = () => {
         />
       </motion.div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+{/* Main Content Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 sm:gap-8">
         {/* Active Campaigns */}
         <div className="xl:col-span-2">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">Active Campaigns</h2>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-white">Active Campaigns</h2>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => navigate("/campaigns")}
+              className="min-h-[44px] w-fit"
             >
               View All
               <ApperIcon name="ArrowRight" className="w-4 h-4 ml-2" />
@@ -184,14 +185,14 @@ const Dashboard = () => {
               onAction={() => setShowCreateModal(true)}
               icon="Target"
             />
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {activeCampaigns.slice(0, 4).map((campaign, index) => (
                 <motion.div
                   key={campaign.Id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: Math.min(index * 0.05, 0.3) }}
                 >
                   <CampaignCard
                     campaign={campaign}

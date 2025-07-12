@@ -3,14 +3,43 @@ import campaignsData from "@/services/mockData/campaigns.json";
 class CampaignService {
   constructor() {
     this.campaigns = [];
+    this._cache = new Map();
+    this._cacheTimeout = 20000; // 20 seconds
   }
-  async delay(ms = 300) {
+
+  async delay(ms = 200) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  async getAll() {
-    await this.delay();
-    return [...this.campaigns];
+  _getCacheKey(method, params = '') {
+    return `${method}_${params}`;
+  }
+
+  _setCache(key, data) {
+    this._cache.set(key, {
+      data,
+      timestamp: Date.now()
+    });
+  }
+
+  _getCache(key) {
+    const cached = this._cache.get(key);
+    if (cached && (Date.now() - cached.timestamp) < this._cacheTimeout) {
+      return cached.data;
+    }
+    this._cache.delete(key);
+    return null;
+  }
+
+async getAll() {
+    const cacheKey = this._getCacheKey('getAll');
+    const cached = this._getCache(cacheKey);
+    if (cached) return cached;
+
+    await this.delay(150);
+    const result = [...this.campaigns];
+    this._setCache(cacheKey, result);
+    return result;
   }
 
   async getById(id) {
@@ -22,8 +51,8 @@ class CampaignService {
     return { ...campaign };
   }
 
-  async create(campaignData) {
-    await this.delay(500);
+async create(campaignData) {
+    await this.delay(350);
     
     const newCampaign = {
       Id: Math.max(...this.campaigns.map(c => c.Id), 0) + 1,
@@ -37,12 +66,13 @@ class CampaignService {
       thumbnailUrl: this.generateThumbnailUrl(campaignData.videoUrl)
     };
 
-    this.campaigns.push(newCampaign);
+    this.campaigns.unshift(newCampaign); // Add to beginning for better UX
+    this._cache.clear(); // Clear cache after mutation
     return { ...newCampaign };
   }
 
-  async update(id, updates) {
-    await this.delay();
+async update(id, updates) {
+    await this.delay(100);
     
     const index = this.campaigns.findIndex(c => c.Id === parseInt(id));
     if (index === -1) {
@@ -50,11 +80,12 @@ class CampaignService {
     }
 
     this.campaigns[index] = { ...this.campaigns[index], ...updates };
+    this._cache.clear(); // Clear cache after mutation
     return { ...this.campaigns[index] };
   }
 
-  async delete(id) {
-    await this.delay();
+async delete(id) {
+    await this.delay(100);
     
     const index = this.campaigns.findIndex(c => c.Id === parseInt(id));
     if (index === -1) {
@@ -62,11 +93,12 @@ class CampaignService {
     }
 
     this.campaigns.splice(index, 1);
+    this._cache.clear(); // Clear cache after mutation
     return true;
   }
 
-  async start(id) {
-    await this.delay();
+async start(id) {
+    await this.delay(100);
     return this.update(id, { 
       status: "running", 
       startedAt: new Date().toISOString() 
@@ -74,12 +106,12 @@ class CampaignService {
   }
 
   async pause(id) {
-    await this.delay();
+    await this.delay(100);
     return this.update(id, { status: "paused" });
   }
 
   async stop(id) {
-    await this.delay();
+    await this.delay(100);
     return this.update(id, { status: "stopped" });
   }
 

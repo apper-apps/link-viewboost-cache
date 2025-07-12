@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import ApperIcon from "@/components/ApperIcon";
 import Button from "@/components/atoms/Button";
@@ -6,7 +6,7 @@ import Badge from "@/components/atoms/Badge";
 import ProgressRing from "@/components/molecules/ProgressRing";
 import { format } from "date-fns";
 
-const CampaignCard = ({ campaign, onStart, onPause, onStop, onView }) => {
+const CampaignCard = React.memo(({ campaign, onStart, onPause, onStop, onView }) => {
   const viewsProgress = (campaign.currentViews / campaign.targetViews) * 100;
   const subscribersProgress = (campaign.currentSubscribers / campaign.targetSubscribers) * 100;
   const overallProgress = (viewsProgress + subscribersProgress) / 2;
@@ -36,15 +36,15 @@ const CampaignCard = ({ campaign, onStart, onPause, onStop, onView }) => {
     return num.toLocaleString();
   };
 
-  return (
+return (
     <motion.div
-      whileHover={{ scale: 1.02, y: -4 }}
-      className="bg-surface border border-gray-700 rounded-xl p-6 hover:border-gray-600 transition-all duration-200 hover:shadow-xl hover:shadow-black/20"
+      whileHover={{ scale: 1.01, y: -2 }}
+      className="bg-surface border border-gray-700 rounded-xl p-4 sm:p-6 hover:border-gray-600 transition-all duration-200 hover:shadow-xl hover:shadow-black/20 touch-manipulation"
     >
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-start gap-3">
-          <div className="w-16 h-12 bg-gray-800 rounded-lg overflow-hidden flex-shrink-0">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
+        <div className="flex items-start gap-3 flex-1 min-w-0">
+          <div className="w-14 h-10 sm:w-16 sm:h-12 bg-gray-800 rounded-lg overflow-hidden flex-shrink-0">
             {campaign.thumbnailUrl ? (
               <img
                 src={campaign.thumbnailUrl}
@@ -53,15 +53,15 @@ const CampaignCard = ({ campaign, onStart, onPause, onStop, onView }) => {
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <ApperIcon name="Play" className="w-6 h-6 text-gray-500" />
+                <ApperIcon name="Play" className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500" />
               </div>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-white truncate" title={campaign.videoTitle}>
+            <h3 className="font-semibold text-white truncate text-sm sm:text-base" title={campaign.videoTitle}>
               {campaign.videoTitle}
             </h3>
-            <p className="text-sm text-gray-400 truncate" title={campaign.videoUrl}>
+            <p className="text-xs sm:text-sm text-gray-400 truncate" title={campaign.videoUrl}>
               {campaign.videoUrl}
             </p>
             <p className="text-xs text-gray-500 mt-1">
@@ -69,24 +69,26 @@ const CampaignCard = ({ campaign, onStart, onPause, onStop, onView }) => {
             </p>
           </div>
         </div>
-        {getStatusBadge(campaign.status)}
+        <div className="flex-shrink-0">
+          {getStatusBadge(campaign.status)}
+        </div>
       </div>
 
       {/* Progress Overview */}
-      <div className="flex items-center justify-center mb-6">
-        <ProgressRing progress={overallProgress} size={100} strokeWidth={6} />
+      <div className="flex items-center justify-center mb-4 sm:mb-6">
+        <ProgressRing progress={overallProgress} size={80} strokeWidth={5} className="sm:w-[100px] sm:h-[100px]" />
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+{/* Stats */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div className="text-center">
-          <p className="text-2xl font-bold font-display text-white">
+          <p className="text-lg sm:text-2xl font-bold font-display text-white">
             {formatNumber(campaign.currentViews)}
           </p>
-          <p className="text-sm text-gray-400">Views</p>
-          <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
+          <p className="text-xs sm:text-sm text-gray-400">Views</p>
+          <div className="w-full bg-gray-700 rounded-full h-1.5 sm:h-2 mt-2">
             <div
-              className="bg-gradient-to-r from-primary to-red-600 h-2 rounded-full transition-all duration-500"
+              className="bg-gradient-to-r from-primary to-red-600 h-full rounded-full transition-all duration-500"
               style={{ width: `${Math.min(viewsProgress, 100)}%` }}
             />
           </div>
@@ -96,13 +98,13 @@ const CampaignCard = ({ campaign, onStart, onPause, onStop, onView }) => {
         </div>
 
         <div className="text-center">
-          <p className="text-2xl font-bold font-display text-white">
+          <p className="text-lg sm:text-2xl font-bold font-display text-white">
             {formatNumber(campaign.currentSubscribers)}
           </p>
-          <p className="text-sm text-gray-400">Subscribers</p>
-          <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
+          <p className="text-xs sm:text-sm text-gray-400">Subscribers</p>
+          <div className="w-full bg-gray-700 rounded-full h-1.5 sm:h-2 mt-2">
             <div
-              className="bg-gradient-to-r from-accent to-cyan-400 h-2 rounded-full transition-all duration-500"
+              className="bg-gradient-to-r from-accent to-cyan-400 h-full rounded-full transition-all duration-500"
               style={{ width: `${Math.min(subscribersProgress, 100)}%` }}
             />
           </div>
@@ -111,11 +113,10 @@ const CampaignCard = ({ campaign, onStart, onPause, onStop, onView }) => {
           </p>
         </div>
       </div>
-
-      {/* Actions */}
-      <div className="flex items-center gap-2">
+{/* Actions */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
         {campaign.status === "pending" && (
-          <Button size="sm" onClick={() => onStart(campaign.Id)} className="flex-1">
+          <Button size="sm" onClick={() => onStart(campaign.Id)} className="flex-1 min-h-[44px]">
             <ApperIcon name="Play" className="w-4 h-4 mr-2" />
             Start
           </Button>
@@ -123,11 +124,11 @@ const CampaignCard = ({ campaign, onStart, onPause, onStop, onView }) => {
         
         {campaign.status === "running" && (
           <>
-            <Button variant="secondary" size="sm" onClick={() => onPause(campaign.Id)} className="flex-1">
+            <Button variant="secondary" size="sm" onClick={() => onPause(campaign.Id)} className="flex-1 min-h-[44px]">
               <ApperIcon name="Pause" className="w-4 h-4 mr-2" />
               Pause
             </Button>
-            <Button variant="danger" size="sm" onClick={() => onStop(campaign.Id)}>
+            <Button variant="danger" size="sm" onClick={() => onStop(campaign.Id)} className="min-h-[44px]">
               <ApperIcon name="Square" className="w-4 h-4" />
             </Button>
           </>
@@ -135,22 +136,24 @@ const CampaignCard = ({ campaign, onStart, onPause, onStop, onView }) => {
         
         {campaign.status === "paused" && (
           <>
-            <Button size="sm" onClick={() => onStart(campaign.Id)} className="flex-1">
+            <Button size="sm" onClick={() => onStart(campaign.Id)} className="flex-1 min-h-[44px]">
               <ApperIcon name="Play" className="w-4 h-4 mr-2" />
               Resume
             </Button>
-            <Button variant="danger" size="sm" onClick={() => onStop(campaign.Id)}>
+            <Button variant="danger" size="sm" onClick={() => onStop(campaign.Id)} className="min-h-[44px]">
               <ApperIcon name="Square" className="w-4 h-4" />
             </Button>
           </>
         )}
 
-        <Button variant="ghost" size="sm" onClick={() => onView(campaign.Id)}>
+        <Button variant="ghost" size="sm" onClick={() => onView(campaign.Id)} className="min-h-[44px]">
           <ApperIcon name="Eye" className="w-4 h-4" />
         </Button>
       </div>
     </motion.div>
-  );
-};
+);
+});
+
+CampaignCard.displayName = 'CampaignCard';
 
 export default CampaignCard;
